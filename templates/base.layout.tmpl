@@ -181,22 +181,17 @@
                     title = "",
                 } = c;
 
-                const { value: formValues } = await Swal.fire({
+                const { value: result } = await Swal.fire({
                     title: title,
                     html: msg,
                     backdrop: false,
                     focusConfirm: false,
                     showCancelButton: true,
                     willOpen: () => {
-                        const elem = document.getElementById("reservation-dates-modal");
-                        const rp = new DateRangePicker(elem, {
-                            format: 'yyyy-mm-dd',
-                            showOnFocus: true,
-                        })
+                        c?.willOpen?.()
                     },
                     didOpen: () => {
-                        document.getElementById("start").removeAttribute("disabled");
-                        document.getElementById("end").removeAttribute("disabled");
+                        c?.didOpen?.()
                     },
                     preConfirm: () => {
                         return [
@@ -206,8 +201,21 @@
                     }
                 })
 
-                if (formValues) {
-                    Swal.fire(JSON.stringify(formValues))
+                // if (formValues) {
+                //     Swal.fire(JSON.stringify(formValues))
+                // }
+                if (result) {
+                    if (result.dismiss !== Swal.DismissReason.cancel) {
+                        if (result.value !== '') {
+                            if (c.callback !== undefined) {
+                                c.callback(result);
+                            }
+                        } else {
+                            c.callback(false);
+                        }
+                    } else {
+                        c.callback(false)
+                    }
                 }
             }
 
@@ -218,27 +226,27 @@
                 custom: custom,
             }
         }
-        let attention = Prompt();
-        document.getElementById("check-availability-button").addEventListener("click", function () {
-        let html = `
-        <form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
-            <div class="form-row">
-                <div class="col">
-                    <div class="form-row" id="reservation-dates-modal">
-                        <div class="col">
-                            <input disabled required class="form-control" type="text" name="start" id="start" placeholder="Arrival">
-                        </div>
-                        <div class="col">
-                            <input disabled required class="form-control" type="text" name="end" id="end" placeholder="Departure">
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </form>
-        `;
-        attention.custom({ title: 'Choose your dates', msg: html, });
-        })
+        // let attention = Prompt();
+        // document.getElementById("check-availability-button").addEventListener("click", function () {
+        // let html = `
+        // <form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
+        //     <div class="form-row">
+        //         <div class="col">
+        //             <div class="form-row" id="reservation-dates-modal">
+        //                 <div class="col">
+        //                     <input disabled required class="form-control" type="text" name="start" id="start" placeholder="Arrival">
+        //                 </div>
+        //                 <div class="col">
+        //                     <input disabled required class="form-control" type="text" name="end" id="end" placeholder="Departure">
+        //                 </div>
+        //
+        //             </div>
+        //         </div>
+        //     </div>
+        // </form>
+        // `;
+        // attention.custom({ title: 'Choose your dates', msg: html, });
+        // })
     </script>
     {{block "js" .}}
     {{end}}
